@@ -17,7 +17,6 @@ export const Examples: React.FC<{ rounds: number; gameConfig: GameConfig; done: 
   const calculateExample = useCallback(
     (state: ExampleState) => {
       const { addition, subtraction, multiplication, upperBound } = gameConfig;
-      const maxValue = upperBound;
       
       // Select operation based on enabled types
       const availableOperations: Array<"+" | "-" | "×"> = [];
@@ -25,23 +24,30 @@ export const Examples: React.FC<{ rounds: number; gameConfig: GameConfig; done: 
       if (subtraction) availableOperations.push('-');
       if (multiplication) availableOperations.push('×');
       
+      // Safeguard: should not happen as button is disabled when no operations selected
+      if (availableOperations.length === 0) {
+        availableOperations.push('+');
+      }
+      
       const randomIndex = getRandomInt(0, availableOperations.length - 1);
       state.operation = availableOperations[randomIndex];
 
       // Generate numbers based on operation
       if (state.operation === '×') {
         // For multiplication, use smaller numbers (1-10) to keep results reasonable
-        const maxMultiplier = Math.min(10, Math.floor(Math.sqrt(maxValue)));
+        const maxMultiplier = Math.min(10, Math.floor(Math.sqrt(upperBound)));
         state.a = getRandomIntExcept(1, maxMultiplier, [state.a]);
         state.b = getRandomIntExcept(1, maxMultiplier, [state.b]);
       } else if (state.operation === '+') {
-        // For addition, ensure result is at least 2 and at most maxValue
-        state.a = getRandomIntExcept(minValue, maxValue - 1, [state.a]);
-        state.b = getRandomIntExcept(minValue, maxValue - state.a, [state.b]);
+        // For addition, ensure result is at least 2 and at most upperBound
+        state.a = getRandomIntExcept(minValue, upperBound - 1, [state.a]);
+        state.b = getRandomIntExcept(minValue, upperBound - state.a, [state.b]);
       } else {
         // For subtraction, ensure result is at least 0
-        state.a = getRandomIntExcept(Math.floor(maxValue / 2), maxValue, [state.a]);
-        state.b = getRandomIntExcept(minValue, state.a, [state.b]);
+        // a must be large enough to allow for meaningful subtraction
+        const minA = Math.max(Math.floor(upperBound / 2), 2);
+        state.a = getRandomIntExcept(minA, upperBound, [state.a]);
+        state.b = getRandomIntExcept(0, state.a, [state.b]);
       }
       
       // Calculate correct answer
@@ -49,7 +55,7 @@ export const Examples: React.FC<{ rounds: number; gameConfig: GameConfig; done: 
       
       // Determine answer range based on operation
       const minAnswer = state.operation === '+' ? 2 : state.operation === '-' ? 0 : 1;
-      const maxAnswer = state.operation === '×' ? maxValue : maxValue;
+      const maxAnswer = upperBound;
       
       // Generate answer options
       const answers: number[] = [];
