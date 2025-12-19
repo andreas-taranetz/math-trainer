@@ -54,7 +54,7 @@ export const Examples: React.FC<{ rounds: number; gameConfig: GameConfig; done: 
       // Generate answer options
       const answers: number[] = [];
       for (let i = 0; i < 5; i++) {
-        answers.push(getRandomIntExcept(Math.max(0, minAnswer), maxAnswer, [...answers, correct]));
+        answers.push(getRandomIntExcept(minAnswer, maxAnswer, [...answers, correct]));
       }
       answers.splice(getRandomInt(0, 5), 0, correct);
       state.options = answers;

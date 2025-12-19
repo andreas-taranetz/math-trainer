@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useMemo } from 'react';
 import { Examples } from './Examples';
 
 export type GameConfig = {
@@ -17,7 +17,7 @@ export const Game: React.FC = () => {
   const [multiplication, setMultiplication] = useState<boolean>(false);
   const [upperBound, setUpperBound] = useState<number>(100);
 
-  const canStart = addition || subtraction || multiplication;
+  const canStart = useMemo(() => addition || subtraction || multiplication, [addition, subtraction, multiplication]);
 
   const startGame = useCallback(() => {
     if (!canStart) return;
