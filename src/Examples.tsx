@@ -5,6 +5,13 @@ import { GameConfig } from './Game';
 
 export const minValue = 1;
 
+// Constants for multiplication problem generation
+const MIN_MULTIPLICATION_FACTOR = 5; // Minimum range to ensure variety
+const MAX_MULTIPLICATION_FACTOR = 10; // Maximum factor to keep results manageable
+
+// Constant for subtraction problem generation
+const MIN_SUBTRACTION_OPERAND = 2; // Minimum value for 'a' to ensure meaningful subtraction
+
 type ExampleState = {
   a: number;
   b: number;
@@ -34,9 +41,9 @@ export const Examples: React.FC<{ rounds: number; gameConfig: GameConfig; done: 
 
       // Generate numbers based on operation
       if (state.operation === '×') {
-        // For multiplication, use smaller numbers (1-10) to keep results reasonable
-        // Ensure at least 5 as max to provide variety
-        const maxMultiplier = Math.max(5, Math.min(10, Math.floor(Math.sqrt(upperBound))));
+        // For multiplication, use smaller numbers to keep results reasonable
+        // Ensure at least MIN_MULTIPLICATION_FACTOR as max to provide variety
+        const maxMultiplier = Math.max(MIN_MULTIPLICATION_FACTOR, Math.min(MAX_MULTIPLICATION_FACTOR, Math.floor(Math.sqrt(upperBound))));
         state.a = getRandomIntExcept(1, maxMultiplier, [state.a]);
         state.b = getRandomIntExcept(1, maxMultiplier, [state.b]);
       } else if (state.operation === '+') {
@@ -46,7 +53,7 @@ export const Examples: React.FC<{ rounds: number; gameConfig: GameConfig; done: 
       } else {
         // For subtraction, ensure result is at least 0
         // a must be large enough to allow for meaningful subtraction (b >= 1)
-        const minA = Math.max(Math.floor(upperBound / 2), 2);
+        const minA = Math.max(Math.floor(upperBound / 2), MIN_SUBTRACTION_OPERAND);
         state.a = getRandomIntExcept(minA, upperBound, [state.a]);
         state.b = getRandomIntExcept(1, state.a, [state.b]);
       }
